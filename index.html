@@ -3,633 +3,503 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>LoL Kalkulator – Pancerz vs Obrażenia</title>
+<title>Arena · Kowadło</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #0a0d13;
     --panel: #12161f;
-    --panel-2: #181d28;
-    --line: #2a2f3b;
+    --line: #262b37;
     --gold: #c8aa6e;
     --gold-dim: #785a28;
     --text: #f0e6d2;
     --text-2: #a09b8c;
     --muted: #6b6a66;
     --win: #0ac8b9;
+    --now: #d8d2c2;
 
-    /* kolory statystyk (sprawdzone pod kątem daltonizmu na ciemnym tle) */
-    --c-ad: #d06f1a;
-    --c-leth: #1e9c8f;
-    --c-pen: #8f63e0;
-    --c-hp: #2e9a5e;
-    --c-armor: #4a7fd6;
+    /* kolory jak w LoL (ikonki zastępcze) */
+    --i-ad: #f0892e; --i-ap: #6f8cff; --i-armor: #e8c35a; --i-mr: #a07cff;
+    --i-hp: #3cc05a; --i-leth: #e5533f; --i-mpen: #b26bf0; --i-dr: #9aa3b5;
+
+    /* kolory linii na wykresie (sprawdzone pod daltonizm na ciemnym tle) */
+    --c-dmg-phys: #d06f1a; --c-flat-phys: #c04fc0;
+    --c-dmg-mag:  #4f86e8; --c-flat-mag:  #c75bb0;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; }
   body {
-    background: radial-gradient(1200px 600px at 50% -200px, #1a2233 0%, var(--bg) 60%) fixed, var(--bg);
-    color: var(--text);
-    font-family: Inter, system-ui, sans-serif;
-    font-size: 15px;
-    line-height: 1.5;
+    background: radial-gradient(1000px 500px at 50% -200px, #1a2233 0%, var(--bg) 60%) fixed, var(--bg);
+    color: var(--text); font-family: Inter, system-ui, sans-serif; font-size: 15px; line-height: 1.4;
     min-height: 100vh;
   }
-  .wrap { max-width: 1120px; margin: 0 auto; padding: 24px 16px 48px; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 20px 16px 40px; }
 
-  header { text-align: center; margin-bottom: 24px; }
-  h1 {
-    font-family: Cinzel, serif; font-weight: 700; letter-spacing: .04em;
-    color: var(--gold); margin: 0; font-size: clamp(22px, 4vw, 34px);
+  /* ---------- góra ---------- */
+  .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+  h1 { font-family: Cinzel, serif; color: var(--gold); margin: 0; font-size: 26px; letter-spacing: .04em; }
+  .seg { display: inline-flex; background: #0b0e14; border: 1px solid var(--line); border-radius: 8px; padding: 3px; gap: 3px; }
+  .seg button {
+    display: inline-flex; align-items: center; gap: 6px; border: 0; background: transparent; color: var(--text-2);
+    font: inherit; font-weight: 600; font-size: 14px; padding: 6px 12px; border-radius: 6px; cursor: pointer;
   }
-  header p { color: var(--text-2); margin: 6px 0 0; }
-  h2 {
-    font-family: Cinzel, serif; font-weight: 600; color: var(--gold);
-    font-size: 17px; letter-spacing: .05em; margin: 0 0 14px; text-transform: uppercase;
-  }
-  h3 { font-size: 15px; margin: 0 0 10px; font-weight: 600; }
+  .seg button.on { background: #1d2331; color: var(--text); box-shadow: inset 0 0 0 1px var(--gold-dim); }
+  .seg .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .toggles { display: flex; gap: 10px; flex-wrap: wrap; }
 
+  /* ---------- panele ---------- */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 760px) { .grid2 { grid-template-columns: 1fr; } }
   .panel {
-    background: linear-gradient(180deg, var(--panel-2), var(--panel));
-    border: 1px solid var(--line);
-    border-top: 2px solid var(--gold-dim);
-    border-radius: 6px;
-    padding: 18px;
+    background: linear-gradient(180deg, #171c27, var(--panel));
+    border: 1px solid var(--line); border-top: 2px solid var(--gold-dim); border-radius: 8px; padding: 16px;
   }
-  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  @media (max-width: 800px) { .grid2 { grid-template-columns: 1fr; } }
-  .stack > * + * { margin-top: 16px; }
+  .ptitle { font-family: Cinzel, serif; color: var(--gold); font-size: 14px; letter-spacing: .08em; margin: 0 0 12px; }
 
   /* ---------- ikonki ---------- */
-  .ic { width: 22px; height: 22px; flex: 0 0 22px; display: inline-flex; align-items: center; justify-content: center; }
+  .ic { width: 24px; height: 24px; flex: 0 0 24px; display: inline-flex; align-items: center; justify-content: center; position: relative; }
   .ic img, .ic svg { width: 100%; height: 100%; object-fit: contain; }
   .ic.sm { width: 16px; height: 16px; flex-basis: 16px; }
-  .ic.pct { position: relative; }
+  .ic.lg { width: 30px; height: 30px; flex-basis: 30px; }
   .ic.pct::after {
-    content: "%"; position: absolute; right: -5px; bottom: -4px;
-    font-size: 10px; font-weight: 700; color: var(--text);
-    background: var(--bg); border-radius: 3px; padding: 0 2px; line-height: 1.2;
+    content: "%"; position: absolute; right: -6px; bottom: -5px; font-size: 10px; font-weight: 700;
+    color: var(--text); background: var(--bg); border-radius: 3px; padding: 0 2px; line-height: 1.2;
   }
+  .pair { display: inline-flex; align-items: center; gap: 3px; cursor: pointer; flex: 0 0 auto; }
+  .pair .slash { color: var(--muted); font-weight: 300; font-size: 18px; margin: 0 1px; }
+  .pair .off { opacity: .28; filter: grayscale(.6); }
 
-  /* ---------- pola ---------- */
-  .field { margin-bottom: 14px; }
-  .field:last-child { margin-bottom: 0; }
-  .field-top { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
-  .field-top label { font-weight: 600; flex: 1; }
-  .field-top .hint { color: var(--muted); font-size: 12px; }
+  /* ---------- suwaki ---------- */
+  .row { display: grid; grid-template-columns: 64px 1fr 76px; gap: 10px; align-items: center; margin-bottom: 12px; }
+  .row:last-child { margin-bottom: 0; }
+  .row .solo { display: flex; justify-content: center; }
+  input[type=range] { width: 100%; accent-color: var(--gold); }
   input[type=number] {
-    width: 96px; background: #0b0e14; color: var(--text);
-    border: 1px solid var(--line); border-radius: 4px; padding: 6px 8px;
-    font: inherit; font-variant-numeric: tabular-nums; text-align: right;
+    width: 76px; background: #0b0e14; color: var(--text); border: 1px solid var(--line); border-radius: 5px;
+    padding: 6px 8px; font: inherit; font-variant-numeric: tabular-nums; text-align: right;
   }
   input[type=number]:focus { outline: 1px solid var(--gold); border-color: var(--gold); }
-  input[type=range] { width: 100%; accent-color: var(--gold); }
 
-  .budget { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
-  .budget .field-top { margin: 0; }
-  .budget input[type=range] { flex: 1; min-width: 160px; }
-  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
-  .chip {
-    background: #0b0e14; color: var(--text-2); border: 1px solid var(--line);
-    border-radius: 999px; padding: 4px 10px; font: inherit; font-size: 13px; cursor: pointer;
-  }
-  .chip:hover { border-color: var(--gold); color: var(--text); }
-
-  /* ---------- kafelki ---------- */
-  .tiles { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
-  @media (max-width: 900px) { .tiles { grid-template-columns: repeat(2, 1fr); } }
-  .tile { background: #0d1118; border: 1px solid var(--line); border-radius: 6px; padding: 12px; }
-  .tile .k { color: var(--text-2); font-size: 12px; display: flex; gap: 6px; align-items: center; }
-  .tile .v { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 2px; }
-  .tile .s { color: var(--muted); font-size: 12px; }
-
-  /* ---------- wyniki ---------- */
+  /* ---------- werdykt ---------- */
+  .vs { display: grid; grid-template-columns: 1fr auto 1fr; align-items: stretch; gap: 10px; }
+  .vs .or { align-self: center; color: var(--muted); font-size: 13px; font-weight: 600; }
   .opt {
-    display: grid; grid-template-columns: 22px 1fr auto; gap: 4px 10px; align-items: center;
-    padding: 10px 12px; border: 1px solid var(--line); border-radius: 6px; margin-bottom: 8px;
-    background: #0d1118;
+    background: #0d1118; border: 1px solid var(--line); border-radius: 8px; padding: 12px; text-align: center;
+    transition: border-color .15s, box-shadow .15s;
   }
-  .opt.best { border-color: var(--win); box-shadow: 0 0 0 1px var(--win) inset; }
-  .opt .name { font-weight: 600; }
-  .opt .buy { color: var(--text-2); font-size: 13px; }
-  .opt .gain { font-weight: 700; font-size: 18px; font-variant-numeric: tabular-nums; text-align: right; }
-  .opt .bar { grid-column: 2 / 4; height: 8px; background: #1b2130; border-radius: 4px; overflow: hidden; }
-  .opt .bar i { display: block; height: 100%; border-radius: 0 4px 4px 0; }
-  .badge {
-    display: inline-block; margin-left: 8px; font-size: 11px; font-weight: 700; letter-spacing: .04em;
-    color: #041a18; background: var(--win); border-radius: 3px; padding: 1px 6px; vertical-align: 2px;
-  }
-  .verdict { margin-top: 10px; color: var(--text-2); font-size: 14px; }
-  .verdict b { color: var(--text); }
-
-  .rules { margin: 12px 0 0; padding: 0; list-style: none; }
-  .rules li { padding: 8px 0; border-top: 1px dashed var(--line); font-size: 14px; color: var(--text-2); }
-  .rules li b { color: var(--text); }
-  .ok { color: var(--win); font-weight: 600; }
+  .opt .what { display: flex; align-items: center; justify-content: center; gap: 6px; font-weight: 700; font-size: 16px; color: var(--text-2); }
+  .opt .gain { font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 4px; color: var(--text-2); }
+  .opt.best { border-color: var(--win); box-shadow: 0 0 0 1px var(--win) inset, 0 0 24px -8px var(--win); }
+  .opt.best .gain { color: var(--text); }
+  .opt.best .what { color: var(--text); }
+  .opt .tag { font-size: 11px; font-weight: 700; letter-spacing: .06em; color: var(--win); height: 14px; margin-top: 2px; }
 
   /* ---------- wykres ---------- */
+  .chart-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+  .big { font-size: 34px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; }
+  .big small { font-size: 13px; font-weight: 500; color: var(--text-2); margin-left: 6px; }
+  .pills { display: flex; gap: 6px; flex-wrap: wrap; }
+  .pill { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: #0b0e14; border: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+  .pill.up { color: #5fd38d; } .pill.down { color: #ef7a6b; }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; color: var(--text-2); margin: 6px 0 4px; }
+  .legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .legend i { width: 16px; height: 0; border-top: 2px solid; display: inline-block; }
   .chart-box { position: relative; }
   .chart-box svg { width: 100%; height: auto; display: block; overflow: visible; }
-  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 13px; color: var(--text-2); margin-bottom: 6px; }
-  .legend span { display: inline-flex; align-items: center; gap: 6px; }
-  .legend i { width: 14px; height: 3px; border-radius: 2px; display: inline-block; }
   .tip {
-    position: absolute; pointer-events: none; background: #05070b; border: 1px solid var(--gold-dim);
-    border-radius: 4px; padding: 6px 8px; font-size: 12px; white-space: nowrap; display: none; z-index: 2;
-    font-variant-numeric: tabular-nums;
+    position: absolute; pointer-events: none; background: #05070b; border: 1px solid var(--gold-dim); border-radius: 5px;
+    padding: 6px 8px; font-size: 12px; white-space: nowrap; display: none; z-index: 2; font-variant-numeric: tabular-nums;
   }
-  .tip .row { display: flex; align-items: center; gap: 6px; }
-  .tip i { width: 8px; height: 8px; border-radius: 2px; display: inline-block; }
+  .tip .r { display: flex; align-items: center; gap: 6px; }
+  .tip i { width: 10px; height: 0; border-top: 2px solid; display: inline-block; }
+  .cross { font-size: 13px; color: var(--text-2); margin-top: 6px; display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+  .cross b { color: var(--text); }
 
-  details { margin-top: 16px; }
-  summary { cursor: pointer; color: var(--gold); font-weight: 600; }
-  details .body { color: var(--text-2); font-size: 14px; padding-top: 8px; }
-  code { background: #0b0e14; border: 1px solid var(--line); border-radius: 3px; padding: 1px 5px; color: var(--text); font-size: 13px; }
-  .gv { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; margin-top: 10px; }
-  .gv .field-top label { font-weight: 500; font-size: 13px; }
-  .gv input { width: 80px; }
+  details { margin-top: 14px; }
+  summary { cursor: pointer; color: var(--text-2); font-size: 13px; }
+  .anv { display: grid; grid-template-columns: auto repeat(2, 76px); gap: 6px 10px; align-items: center; margin-top: 10px; font-size: 13px; }
+  .anv .h { color: var(--text-2); font-weight: 600; text-align: right; }
 
-  footer { color: var(--muted); font-size: 12px; text-align: center; margin-top: 32px; }
+  footer { color: var(--muted); font-size: 11px; text-align: center; margin-top: 24px; }
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <header>
-    <h1>Pancerz vs Obrażenia</h1>
-    <p>Co się bardziej opłaca za tego samego golda: AD, lethality czy % przebicia? Zdrowie czy pancerz?</p>
-  </header>
-
-  <!-- ===================== WEJŚCIE ===================== -->
-  <div class="grid2">
-    <section class="panel">
-      <h2>Obrońca (cel)</h2>
-      <div id="defender-fields"></div>
-    </section>
-    <section class="panel">
-      <h2>Atakujący</h2>
-      <div id="attacker-fields"></div>
-    </section>
-  </div>
-
-  <section class="panel" style="margin-top:16px">
-    <div class="budget">
-      <div class="field-top">
-        <span class="ic" data-icon="gold"></span>
-        <label for="budget">Budżet do wydania</label>
-        <input type="number" id="budget" min="0" max="10000" step="50">
+  <div class="top">
+    <h1>Arena · Kowadło</h1>
+    <div class="toggles">
+      <div class="seg" id="seg-mode">
+        <button data-v="phys"><span class="ic sm" data-icon="ad"></span>Fizyczne</button>
+        <button data-v="mag"><span class="ic sm" data-icon="ap"></span>Magiczne</button>
       </div>
-      <input type="range" id="budget-range" min="50" max="3500" step="50" aria-label="Budżet">
-      <div class="chips">
-        <button class="chip" data-b="350">350 (Long Sword)</button>
-        <button class="chip" data-b="1000">1000</button>
-        <button class="chip" data-b="3000">3000 (całe item)</button>
+      <div class="seg" id="seg-tier">
+        <button data-v="silver"><span class="dot" style="background:#a7adb8"></span>Szare</button>
+        <button data-v="gold"><span class="dot" style="background:#e2b84a"></span>Złote</button>
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- ===================== STAN OBECNY ===================== -->
-  <section class="panel" style="margin-top:16px">
-    <h2>Stan obecny</h2>
-    <div class="tiles" id="tiles"></div>
-  </section>
-
-  <!-- ===================== WYNIKI ===================== -->
-  <div class="grid2" style="margin-top:16px">
+  <div class="grid2">
     <section class="panel">
-      <h2>Co kupić atakującemu?</h2>
-      <div id="att-opts"></div>
-      <div class="verdict" id="att-verdict"></div>
-      <ul class="rules" id="att-rules"></ul>
+      <div class="ptitle">ATAKUJĄCY</div>
+      <div id="atk-rows"></div>
     </section>
     <section class="panel">
-      <h2>Co kupić obrońcy?</h2>
-      <div id="def-opts"></div>
-      <div class="verdict" id="def-verdict"></div>
-      <ul class="rules" id="def-rules"></ul>
+      <div class="ptitle">CEL</div>
+      <div id="def-rows"></div>
     </section>
   </div>
 
-  <!-- ===================== WYKRESY ===================== -->
-  <div class="grid2" style="margin-top:16px">
+  <div class="grid2" style="margin-top:14px">
     <section class="panel">
-      <h3>Wzrost obrażeń w zależności od wydanego golda</h3>
-      <div class="legend" id="att-legend"></div>
-      <div class="chart-box" id="att-chart"></div>
+      <div class="ptitle">KOWADŁO · ATAK</div>
+      <div class="vs" id="vs-atk"></div>
     </section>
     <section class="panel">
-      <h3>Wzrost efektywnego HP w zależności od wydanego golda</h3>
-      <div class="legend" id="def-legend"></div>
-      <div class="chart-box" id="def-chart"></div>
+      <div class="ptitle">KOWADŁO · OBRONA</div>
+      <div class="vs" id="vs-def"></div>
     </section>
   </div>
 
-  <!-- ===================== USTAWIENIA / WZORY ===================== -->
-  <section class="panel" style="margin-top:16px">
+  <section class="panel" style="margin-top:14px">
+    <div class="chart-head">
+      <div class="big" id="big"></div>
+      <div class="pills" id="pills"></div>
+    </div>
+    <div class="legend" id="legend"></div>
+    <div class="chart-box" id="chart"></div>
+    <div class="cross" id="cross"></div>
+
     <details>
-      <summary>Wartość statystyk w goldzie (można zmienić)</summary>
-      <div class="body">
-        Domyślne wartości wynikają z najtańszych „czystych” przedmiotów:
-        Long Sword (350g / 10 AD), Serrated Dirk (1000g / 10 lethality, po odjęciu wartości AD),
-        Last Whisper (1450g / 20 AD + 18% przebicia), Ruby Crystal (400g / 150 HP), Cloth Armor (300g / 15 pancerza).
-        <div class="gv" id="gold-values"></div>
-      </div>
-    </details>
-    <details>
-      <summary>Jak to jest liczone?</summary>
-      <div class="body">
-        <p><b>1. Pancerz → redukcja obrażeń.</b> Mnożnik obrażeń = <code>100 / (100 + pancerz)</code>.
-          100 pancerza = 50% redukcji, 200 = 66,7%, 300 = 75%. Każdy punkt pancerza daje tyle samo
-          „efektywnego HP” (1% HP), dlatego pancerz nie traci na wartości liniowo, tylko redukcja procentowa rośnie coraz wolniej.</p>
-        <p><b>2. Efektywne HP</b> = <code>HP × (1 + pancerz / 100)</code> – ile obrażeń „przed pancerzem” trzeba zadać, żeby zabić cel.</p>
-        <p><b>3. Kolejność przebicia:</b> najpierw redukcja płaska, potem redukcja %, potem <b>% przebicia</b>
-          (pancerz × (1 − %)), na końcu <b>lethality</b> (odejmowane płasko). Przebicie nie zbije pancerza poniżej 0.
-          Od patcha 14.1 lethality <b>nie skaluje się z poziomem</b> – 1 lethality = 1 pkt przebicia.</p>
-        <p><b>4. Kilka źródeł % przebicia</b> stackuje się multiplikatywnie: 18% i 30% daje 1 − 0,82 × 0,70 = 42,6%.</p>
-        <p><b>5. Model obrażeń:</b> obrażenia = <code>AD × mnożnik</code> (auto-atak lub umiejętność o skalowaniu 100% AD).
-          Kalkulator porównuje, o ile % wzrosną obrażenia (lub efektywne HP), jeśli ten sam budżet wydasz na każdą ze statystyk.</p>
-        <p><b>Czego nie uwzględnia (jeszcze):</b> obrażeń bazowych umiejętności, prędkości ataku, krytów,
-          efektów pasywnych przedmiotów, tego że przedmioty sprzedaje się w paczkach (nie da się kupić „samego” lethality) oraz limitu 6 slotów.</p>
-      </div>
+      <summary>Wartości kowadeł</summary>
+      <div class="anv" id="anv"></div>
     </details>
   </section>
 
   <footer>
-    Kalkulator nie jest wspierany przez Riot Games i nie odzwierciedla poglądów Riot Games ani osób oficjalnie zaangażowanych w tworzenie League of Legends.
-    League of Legends i Riot Games są znakami towarowymi Riot Games, Inc. Ikonki: League of Legends Wiki.
+    Nieoficjalny kalkulator fanowski, niezwiązany z Riot Games. League of Legends jest znakiem towarowym Riot Games, Inc. Ikonki: League of Legends Wiki.
   </footer>
 </div>
 
 <script>
 /* =====================================================================
-   IKONKI
-   Najpierw próbujemy ikonek z LoL Wiki, potem z lokalnego folderu icons/,
-   a jak nic nie zadziała – rysujemy własną prostą ikonkę SVG.
+   IKONKI – najpierw LoL Wiki, potem folder icons/, na końcu własne SVG
    ===================================================================== */
 const WIKI = 'https://wiki.leagueoflegends.com/en-us/images/';
 const ICONS = {
-  ad:    { src: [WIKI + 'Attack_damage_icon.svg', 'icons/ad.png'],   color: 'var(--c-ad)' },
-  leth:  { src: [WIKI + 'Lethality_icon.svg', WIKI + 'Armor_penetration_icon.svg', 'icons/lethality.png'], color: 'var(--c-leth)' },
-  pen:   { src: [WIKI + 'Armor_penetration_icon.svg', 'icons/armorpen.png'], color: 'var(--c-pen)', pct: true },
-  hp:    { src: [WIKI + 'Health_icon.png', 'icons/health.png'],      color: 'var(--c-hp)' },
-  armor: { src: [WIKI + 'Armor_icon.svg', 'icons/armor.png'],        color: 'var(--c-armor)' },
-  gold:  { src: [WIKI + 'Gold_colored_icon.svg', 'icons/gold.png'],  color: '#c8aa6e' },
+  ad:    { name: 'AD',                         src: [WIKI + 'Attack_damage_icon.svg', 'icons/ad.png'],          color: 'var(--i-ad)' },
+  ap:    { name: 'AP',                         src: [WIKI + 'Ability_power_icon.svg', 'icons/ap.png'],          color: 'var(--i-ap)' },
+  leth:  { name: 'Lethality',                  src: [WIKI + 'Armor_penetration_icon.svg', 'icons/lethality.png'], color: 'var(--i-leth)' },
+  mpen:  { name: 'Przebicie odporności na magię', src: [WIKI + 'Magic_penetration_icon.svg', 'icons/magicpen.png'], color: 'var(--i-mpen)' },
+  apenp: { name: '% przebicia pancerza',       src: [WIKI + 'Armor_penetration_icon.svg', 'icons/lethality.png'], color: 'var(--i-leth)', pct: true },
+  mpenp: { name: '% przebicia odporności na magię', src: [WIKI + 'Magic_penetration_icon.svg', 'icons/magicpen.png'], color: 'var(--i-mpen)', pct: true },
+  hp:    { name: 'Zdrowie',                    src: [WIKI + 'Health_icon.png', 'icons/health.png'],            color: 'var(--i-hp)' },
+  armor: { name: 'Pancerz',                    src: [WIKI + 'Armor_icon.svg', 'icons/armor.png'],              color: 'var(--i-armor)' },
+  mr:    { name: 'Odporność na magię',         src: [WIKI + 'Magic_resistance_icon.svg', 'icons/mr.png'],      color: 'var(--i-mr)' },
+  dr:    { name: 'Redukcja obrażeń (np. Exhaust, Anathema\'s Chains)', src: [],                            color: 'var(--i-dr)' },
 };
-const FALLBACK_SVG = {
-  ad:    '<path d="M19 3l2 0 0 2-9.5 9.5-2-2z" fill="currentColor"/><path d="M8 13l3 3-1.5 1.5-1-1L5 20l-1-1 3.5-3.5-1-1z" fill="currentColor"/>',
-  armor: '<path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z" fill="currentColor"/>',
-  hp:    '<path d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z" fill="currentColor"/>',
+const SVG = {
+  ad:    '<path d="M19 3h2v2l-9.5 9.5-2-2z" fill="currentColor"/><path d="M8 13l3 3-1.5 1.5-1-1L5 20l-1-1 3.5-3.5-1-1z" fill="currentColor"/>',
+  ap:    '<path d="M12 2l2.6 6.9L22 9.3l-5.8 4.6 2 7.1L12 17l-6.2 4 2-7.1L2 9.3l7.4-.4z" fill="currentColor"/>',
   leth:  '<path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 18L18 6" stroke="currentColor" stroke-width="2.5"/>',
-  pen:   '<path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 5l-2 6h3l-2 7" fill="none" stroke="currentColor" stroke-width="2"/>',
-  gold:  '<ellipse cx="12" cy="7" rx="7" ry="3" fill="currentColor"/><path d="M5 7v5c0 1.7 3.1 3 7 3s7-1.3 7-3V7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 12v5c0 1.7 3.1 3 7 3s7-1.3 7-3v-5" fill="none" stroke="currentColor" stroke-width="2"/>',
+  apenp: '<path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 18L18 6" stroke="currentColor" stroke-width="2.5"/>',
+  mpen:  '<circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 19L19 5" stroke="currentColor" stroke-width="2.5"/>',
+  mpenp: '<circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 19L19 5" stroke="currentColor" stroke-width="2.5"/>',
+  hp:    '<path d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z" fill="currentColor"/>',
+  armor: '<path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z" fill="currentColor"/>',
+  mr:    '<path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z" fill="currentColor"/><path d="M12 7l1.5 3.5L17 12l-3.5 1.5L12 17l-1.5-3.5L7 12l3.5-1.5z" fill="#0a0d13"/>',
+  dr:    '<path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v9m-4-4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2"/>',
 };
-function iconHTML(key, size = '') {
-  return `<span class="ic ${size} ${ICONS[key].pct ? 'pct' : ''}" data-icon="${key}"></span>`;
+function ic(key, size = '', extra = '') {
+  return `<span class="ic ${size} ${ICONS[key].pct ? 'pct' : ''} ${extra}" data-icon="${key}" title="${ICONS[key].name}"></span>`;
+}
+const RESOLVED = {}; // zapamiętane: który adres ikonki działa (albo 'svg')
+function paintIcon(el, key, src) {
+  const def = ICONS[key];
+  if (src === 'svg') {
+    el.innerHTML = `<svg viewBox="0 0 24 24" style="color:${def.color}" aria-hidden="true">${SVG[key]}</svg>`;
+  } else {
+    el.innerHTML = `<img src="${src}" alt="${def.name}">`;
+  }
 }
 function hydrateIcons(root = document) {
   root.querySelectorAll('[data-icon]:not([data-done])').forEach(el => {
     el.dataset.done = '1';
     const key = el.dataset.icon, def = ICONS[key];
-    const tryNext = (i) => {
-      if (i >= def.src.length) {
-        el.innerHTML = `<svg viewBox="0 0 24 24" style="color:${def.color}" aria-hidden="true">${FALLBACK_SVG[key]}</svg>`;
-        return;
-      }
+    if (RESOLVED[key]) { paintIcon(el, key, RESOLVED[key]); return; }
+    const next = i => {
+      if (i >= def.src.length) { RESOLVED[key] = 'svg'; paintIcon(el, key, 'svg'); return; }
       const img = new Image();
-      img.alt = '';
-      img.onload = () => { el.innerHTML = ''; el.appendChild(img); };
-      img.onerror = () => tryNext(i + 1);
+      img.onload = () => { RESOLVED[key] = def.src[i]; paintIcon(el, key, def.src[i]); };
+      img.onerror = () => next(i + 1);
       img.src = def.src[i];
     };
-    tryNext(0);
+    next(0);
   });
 }
 
 /* =====================================================================
-   STAN
+   DANE
+   Wartości kowadeł z LoL Wiki (Stat Bonus (Arena)). Można je zmienić na stronie.
    ===================================================================== */
-const state = { hp: 2200, armor: 120, ad: 250, leth: 0, pen: 0, budget: 1000 };
-const gold  = { ad: 35, leth: 30, pen: 41.67, hp: 2.667, armor: 20 };
-
-const LABEL = {
-  ad: 'Obrażenia od ataku (AD)', leth: 'Lethality', pen: '% przebicia pancerza',
-  hp: 'Zdrowie (HP)', armor: 'Pancerz',
+const ANVIL = {
+  silver: { ad: 15, leth: 15, ap: 25, mpen: 15, hp: 150, armor: 15, mr: 15 },
+  gold:   { ad: 35, leth: 20, ap: 50, mpen: 18, hp: 375, armor: 45, mr: 45 },
 };
-const SHORT = { ad: 'AD', leth: 'lethality', pen: '% przebicia', hp: 'HP', armor: 'pancerza' };
+// jakie statystyki są „w grze” w danym trybie
+const MODE = {
+  phys: { dmg: 'ad', flat: 'leth', pct: 'apenp', res: 'armor', cDmg: 'var(--c-dmg-phys)', cFlat: 'var(--c-flat-phys)' },
+  mag:  { dmg: 'ap', flat: 'mpen', pct: 'mpenp', res: 'mr',    cDmg: 'var(--c-dmg-mag)',  cFlat: 'var(--c-flat-mag)' },
+};
+const PAIR = { dmg: ['ad', 'ap'], flat: ['leth', 'mpen'], pct: ['apenp', 'mpenp'], res: ['armor', 'mr'] };
 
-const FIELDS = {
-  defender: [
-    { key: 'hp',    min: 0, max: 6000, step: 10, hint: 'np. 2000–4000 w late game' },
-    { key: 'armor', min: 0, max: 400,  step: 1,  hint: 'całkowity pancerz' },
-  ],
-  attacker: [
-    { key: 'ad',    min: 0, max: 700, step: 1,   hint: 'całkowite AD' },
-    { key: 'leth',  min: 0, max: 100, step: 1,   hint: 'płaskie przebicie' },
-    { key: 'pen',   min: 0, max: 80,  step: 0.5, hint: '% (już zsumowane)' },
-  ],
+const state = {
+  mode: 'phys', tier: 'gold',
+  phys: { dmg: 200, flat: 10, pct: 0, res: 120 },
+  mag:  { dmg: 300, flat: 10, pct: 0, res: 90 },
+  hp: 3000, dr: 0,
+};
+const LIMITS = {
+  dmg: [0, 800, 1], flat: [0, 80, 1], pct: [0, 70, 0.5], res: [0, 400, 1], hp: [500, 8000, 10], dr: [0, 80, 1],
 };
 
 /* =====================================================================
-   MATEMATYKA
+   MATEMATYKA – tak samo dla pancerza i odporności na magię
    ===================================================================== */
-// pancerz po przebiciu: najpierw %, potem lethality, nie schodzi poniżej 0
-function effArmor(armor, penPct, leth) {
-  if (armor <= 0) return armor;
-  const p = Math.min(Math.max(penPct, 0), 100) / 100;
-  return Math.max(0, armor * (1 - p) - Math.max(leth, 0));
+// najpierw % przebicia, potem płaskie (lethality / magic pen); nie niżej niż 0
+function effRes(res, pct, flat) {
+  if (res <= 0) return res;
+  return Math.max(0, res * (1 - Math.min(pct, 100) / 100) - Math.max(flat, 0));
 }
-// mnożnik obrażeń
-function mult(a) { return a >= 0 ? 100 / (100 + a) : 2 - 100 / (100 - a); }
-// % przebicia stackuje się multiplikatywnie
-function addPen(current, extra) {
-  return 100 * (1 - (1 - Math.min(current, 100) / 100) * (1 - Math.min(extra, 100) / 100));
-}
-function calc(s) {
-  const ea = effArmor(s.armor, s.pen, s.leth);
-  const m = mult(ea);
-  const dmg = s.ad * m;
-  const ehp = s.hp / m;
-  return { ea, m, dmg, ehp, hits: dmg > 0 ? Math.ceil(s.hp / dmg) : Infinity };
-}
-// warianty zakupu za `g` golda
-function attackerOptions(s, g) {
-  const base = calc(s).dmg;
-  const mk = (key, next, amount) => {
-    const d = calc(next).dmg;
-    return { key, amount, gain: base > 0 ? d / base - 1 : 0, dmg: d };
-  };
-  return [
-    mk('ad',   { ...s, ad: s.ad + g / gold.ad },            g / gold.ad),
-    mk('leth', { ...s, leth: s.leth + g / gold.leth },      g / gold.leth),
-    mk('pen',  { ...s, pen: addPen(s.pen, g / gold.pen) },  g / gold.pen),
-  ];
-}
-function defenderOptions(s, g) {
-  const base = calc(s).ehp;
-  const mk = (key, next, amount) => {
-    const e = calc(next).ehp;
-    return { key, amount, gain: base > 0 ? e / base - 1 : 0, ehp: e };
-  };
-  return [
-    mk('hp',    { ...s, hp: s.hp + g / gold.hp },          g / gold.hp),
-    mk('armor', { ...s, armor: s.armor + g / gold.armor }, g / gold.armor),
-  ];
-}
+function mult(r) { return r >= 0 ? 100 / (100 + r) : 2 - 100 / (100 - r); }
+// obrażenia jednego ciosu o skalowaniu 100%
+function hit(dmg, flat, pct, res, dr) { return dmg * mult(effRes(res, pct, flat)) * (1 - dr / 100); }
+function ehp(hp, res, pct, flat, dr) { return hp / (mult(effRes(res, pct, flat)) * (1 - Math.min(dr, 99) / 100)); }
 
 /* =====================================================================
-   FORMATOWANIE
+   UI
    ===================================================================== */
+const SHORT = { ad: 'AD', ap: 'AP', leth: 'Lethality', mpen: 'Magic Pen', armor: 'Pancerz', mr: 'MR' };
+const cur = () => state[state.mode];
+const M = () => MODE[state.mode];
 const nf0 = new Intl.NumberFormat('pl-PL', { maximumFractionDigits: 0 });
-const nf1 = new Intl.NumberFormat('pl-PL', { maximumFractionDigits: 1 });
-const pct = (x, d = 1) => (x >= 0 ? '+' : '') + new Intl.NumberFormat('pl-PL', { maximumFractionDigits: d, minimumFractionDigits: d }).format(x * 100) + '%';
+const pct = x => (x >= 0 ? '+' : '−') + new Intl.NumberFormat('pl-PL', { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(Math.abs(x * 100)) + '%';
 
-/* =====================================================================
-   BUDOWA FORMULARZA
-   ===================================================================== */
-function buildFields(containerId, list) {
-  const box = document.getElementById(containerId);
-  box.innerHTML = list.map(f => `
-    <div class="field">
-      <div class="field-top">
-        ${iconHTML(f.key)}
-        <label for="in-${f.key}">${LABEL[f.key]}</label>
-        <input type="number" id="in-${f.key}" step="${f.step}" value="${state[f.key]}">
-      </div>
-      <input type="range" id="rg-${f.key}" min="${f.min}" max="${f.max}" step="${f.step}" value="${state[f.key]}" aria-label="${LABEL[f.key]}">
-      <div class="hint" style="color:var(--muted);font-size:12px">${f.hint}</div>
-    </div>`).join('');
-  list.forEach(f => bind(f.key, `in-${f.key}`, `rg-${f.key}`));
+function pairHTML(slot) {
+  const [p, m] = PAIR[slot];
+  const on = state.mode === 'phys' ? p : m;
+  return `<span class="pair" data-toggle title="Przełącz fizyczne / magiczne">
+    ${ic(p, '', on === p ? '' : 'off')}<span class="slash">/</span>${ic(m, '', on === m ? '' : 'off')}</span>`;
 }
-function bind(key, numId, rangeId) {
-  const num = document.getElementById(numId), rg = document.getElementById(rangeId);
-  num.value = state[key]; rg.value = state[key];
-  num.addEventListener('input', () => {
-    const v = parseFloat(num.value);
-    if (!isNaN(v)) { state[key] = v; rg.value = v; render(); }
-  });
-  rg.addEventListener('input', () => { state[key] = parseFloat(rg.value); num.value = rg.value; render(); });
+function rowHTML(id, iconHTML, slot) {
+  const [min, max, step] = LIMITS[slot];
+  return `<div class="row">
+    ${iconHTML}
+    <input type="range" id="rg-${id}" min="${min}" max="${max}" step="${step}">
+    <input type="number" id="in-${id}" step="${step}">
+  </div>`;
 }
+function buildRows() {
+  document.getElementById('atk-rows').innerHTML =
+    rowHTML('dmg', pairHTML('dmg'), 'dmg') +
+    rowHTML('flat', pairHTML('flat'), 'flat') +
+    rowHTML('pct', pairHTML('pct'), 'pct');
+  document.getElementById('def-rows').innerHTML =
+    rowHTML('hp', `<span class="solo">${ic('hp')}</span>`, 'hp') +
+    rowHTML('res', pairHTML('res'), 'res') +
+    rowHTML('dr', `<span class="solo">${ic('dr')}</span>`, 'dr');
 
-function buildGoldValues() {
-  const box = document.getElementById('gold-values');
-  box.innerHTML = Object.keys(gold).map(k => `
-    <div class="field-top">
-      ${iconHTML(k, 'sm')}
-      <label for="gv-${k}">1 ${SHORT[k]} =</label>
-      <input type="number" id="gv-${k}" step="0.01" min="0.01" value="${gold[k]}">
-      ${iconHTML('gold', 'sm')}
-    </div>`).join('');
-  Object.keys(gold).forEach(k => {
-    document.getElementById('gv-' + k).addEventListener('input', e => {
-      const v = parseFloat(e.target.value);
-      if (v > 0) { gold[k] = v; render(); }
+  const getter = id => (id === 'hp' || id === 'dr') ? state[id] : cur()[id];
+  const setter = (id, v) => { if (id === 'hp' || id === 'dr') state[id] = v; else cur()[id] = v; };
+  ['dmg', 'flat', 'pct', 'hp', 'res', 'dr'].forEach(id => {
+    const rg = document.getElementById('rg-' + id), num = document.getElementById('in-' + id);
+    rg.value = num.value = getter(id);
+    rg.addEventListener('input', () => { setter(id, +rg.value); num.value = rg.value; render(); });
+    num.addEventListener('input', () => {
+      const v = parseFloat(num.value);
+      if (!isNaN(v)) { setter(id, v); rg.value = v; render(); }
     });
   });
+  document.querySelectorAll('[data-toggle]').forEach(el =>
+    el.addEventListener('click', () => setMode(state.mode === 'phys' ? 'mag' : 'phys')));
+  hydrateIcons();
+}
+function setMode(m) { state.mode = m; syncSeg(); buildRows(); render(); }
+function syncSeg() {
+  document.querySelectorAll('#seg-mode button').forEach(b => b.classList.toggle('on', b.dataset.v === state.mode));
+  document.querySelectorAll('#seg-tier button').forEach(b => b.classList.toggle('on', b.dataset.v === state.tier));
 }
 
-/* =====================================================================
-   RENDER
-   ===================================================================== */
+function vsHTML(a, b) {
+  const tie = Math.abs(a.gain - b.gain) < 0.0005;
+  const card = (o, best) => `<div class="opt ${best ? 'best' : ''}">
+      <div class="what">${ic(o.icon, 'lg')}+${nf0.format(o.amount)}</div>
+      <div class="gain">${pct(o.gain)}</div>
+      <div class="tag">${best ? (tie ? 'REMIS' : 'BIERZ') : ''}</div>
+    </div>`;
+  return card(a, tie || a.gain > b.gain) + `<div class="or">vs</div>` + card(b, tie || b.gain > a.gain);
+}
+
 function render() {
-  const c = calc(state);
-  const g = state.budget;
+  const s = cur(), m = M(), A = ANVIL[state.tier];
+  const base = hit(s.dmg, s.flat, s.pct, s.res, state.dr);
 
-  // --- kafelki ---
-  const dr = 1 - c.m;
-  document.getElementById('tiles').innerHTML = `
-    <div class="tile"><div class="k">${iconHTML('armor','sm')} Pancerz po przebiciu</div>
-      <div class="v">${nf1.format(c.ea)}</div><div class="s">z ${nf0.format(state.armor)} bazowo</div></div>
-    <div class="tile"><div class="k">${iconHTML('armor','sm')} Redukcja obrażeń</div>
-      <div class="v">${nf1.format(dr * 100)}%</div><div class="s">mnożnik ×${c.m.toFixed(3)}</div></div>
-    <div class="tile"><div class="k">${iconHTML('ad','sm')} Obrażenia na cios</div>
-      <div class="v">${nf0.format(c.dmg)}</div><div class="s">z ${nf0.format(state.ad)} AD</div></div>
-    <div class="tile"><div class="k">${iconHTML('hp','sm')} Efektywne HP</div>
-      <div class="v">${nf0.format(c.ehp)}</div><div class="s">z ${nf0.format(state.hp)} HP</div></div>
-    <div class="tile"><div class="k">${iconHTML('ad','sm')} Ciosów do zabicia</div>
-      <div class="v">${isFinite(c.hits) ? c.hits : '∞'}</div><div class="s">auto-ataków po 100% AD</div></div>`;
+  // --- atak ---
+  const aDmg  = { icon: m.dmg,  amount: A[m.dmg],  gain: base > 0 ? hit(s.dmg + A[m.dmg], s.flat, s.pct, s.res, state.dr) / base - 1 : 0 };
+  const aFlat = { icon: m.flat, amount: A[m.flat], gain: base > 0 ? hit(s.dmg, s.flat + A[m.flat], s.pct, s.res, state.dr) / base - 1 : 0 };
+  document.getElementById('vs-atk').innerHTML = vsHTML(aDmg, aFlat);
 
-  // --- opcje atakującego ---
-  const ao = attackerOptions(state, g);
-  renderOptions('att-opts', ao, g, 'obrażeń');
-  const aBest = ao.reduce((a, b) => (b.gain > a.gain ? b : a));
-  document.getElementById('att-verdict').innerHTML =
-    `Za <b>${nf0.format(g)} golda</b> najbardziej opłaca się <b>${LABEL[aBest.key]}</b> – obrażenia rosną o <b>${pct(aBest.gain)}</b>.`;
+  // --- obrona (przeciwko przebiciu atakującego) ---
+  const e0 = ehp(state.hp, s.res, s.pct, s.flat, state.dr);
+  const dHp  = { icon: 'hp',  amount: A.hp,    gain: ehp(state.hp + A.hp, s.res, s.pct, s.flat, state.dr) / e0 - 1 };
+  const dRes = { icon: m.res, amount: A[m.res], gain: ehp(state.hp, s.res + A[m.res], s.pct, s.flat, state.dr) / e0 - 1 };
+  document.getElementById('vs-def').innerHTML = vsHTML(dHp, dRes);
 
-  // --- opcje obrońcy ---
-  const dop = defenderOptions(state, g);
-  renderOptions('def-opts', dop, g, 'efektywnego HP');
-  const dBest = dop.reduce((a, b) => (b.gain > a.gain ? b : a));
-  document.getElementById('def-verdict').innerHTML =
-    `Za <b>${nf0.format(g)} golda</b> lepiej kupić <b>${LABEL[dBest.key]}</b> – efektywne HP rośnie o <b>${pct(dBest.gain)}</b>.`;
+  // --- nagłówek wykresu ---
+  const noPen = hit(s.dmg, 0, 0, s.res, state.dr);
+  const noDr  = hit(s.dmg, s.flat, s.pct, s.res, 0);
+  const hits  = base > 0 ? Math.ceil(state.hp / base) : '∞';
+  document.getElementById('big').innerHTML = `${nf0.format(base)}<small>obrażeń / cios · ${hits} ciosów</small>`;
+  let pills = '';
+  if (noPen > 0 && base / (noPen) - 1 > 0.0005 && (s.flat > 0 || s.pct > 0))
+    pills += `<span class="pill up">${ic(m.flat, 'sm')}${ic(m.pct, 'sm')} ${pct(hit(s.dmg, s.flat, s.pct, s.res, 0) / hit(s.dmg, 0, 0, s.res, 0) - 1)}</span>`;
+  if (state.dr > 0 && noDr > 0)
+    pills += `<span class="pill down">${ic('dr', 'sm')} ${pct(base / noDr - 1)}</span>`;
+  document.getElementById('pills').innerHTML = pills;
 
-  renderRules(c);
-  renderCharts();
+  renderChart(s, m, A);
   hydrateIcons();
 }
 
-function renderOptions(id, opts, g, what) {
-  const maxGain = Math.max(...opts.map(o => o.gain), 1e-9);
-  const best = opts.reduce((a, b) => (b.gain > a.gain ? b : a));
-  const unit = k => (k === 'pen' ? '%' : '');
-  document.getElementById(id).innerHTML = opts.map(o => {
-    const isBest = o === best && o.gain > 0;
-    return `<div class="opt ${isBest ? 'best' : ''}">
-      ${iconHTML(o.key)}
-      <div>
-        <div class="name">${LABEL[o.key]}${isBest ? '<span class="badge">NAJLEPSZE</span>' : ''}</div>
-        <div class="buy">+${nf1.format(o.amount)}${unit(o.key)} ${SHORT[o.key] === '% przebicia' ? 'przebicia' : SHORT[o.key]} za ${nf0.format(g)}g
-          · ${g > 0 ? nf1.format(o.gain * 100 / (g / 100)) : 0}% ${what} / 100g</div>
-      </div>
-      <div class="gain">${pct(o.gain)}</div>
-      <div class="bar"><i style="width:${Math.max(0, o.gain / maxGain * 100)}%;background:var(--c-${o.key})"></i></div>
-    </div>`;
-  }).join('');
-}
-
-// reguły „na oko” – porównanie przy bardzo małym zakupie (pochodne)
-function renderRules(c) {
-  const s = state, A = s.armor, P = Math.min(s.pen, 100) / 100, ea = c.ea;
-  const pierced = A > 0 && ea <= 0;
-
-  const att = [];
-  if (A <= 0) {
-    att.push(`Cel nie ma pancerza – <b>przebicie nic nie daje</b>, kupuj AD.`);
-  } else if (pierced) {
-    att.push(`Pancerz celu jest <b>całkowicie przebity</b> (0 po przebiciu) – kolejne przebicie jest zmarnowane, kupuj AD.`);
-  } else {
-    const thrLeth = (gold.leth / gold.ad) * (100 + ea);
-    att.push(`<b>Lethality vs AD:</b> lethality wygrywa, gdy AD &gt; ${(gold.leth / gold.ad).toFixed(2)} × (100 + pancerz po przebiciu) = <b>${nf0.format(thrLeth)}</b>.
-      Masz ${nf0.format(s.ad)} AD → ${s.ad > thrLeth ? '<span class="ok">lethality</span>' : '<span class="ok">AD</span>'}.`);
-    const thrPenAD = (gold.pen / gold.ad) * (100 + ea) / (0.01 * A * (1 - P));
-    att.push(`<b>% przebicia vs AD:</b> % przebicia wygrywa, gdy AD &gt; <b>${nf0.format(thrPenAD)}</b> (przy tym pancerzu celu).
-      ${s.ad > thrPenAD ? '<span class="ok">% przebicia</span>' : '<span class="ok">AD</span>'}.`);
-    const thrPL = 100 * gold.pen / gold.leth;
-    att.push(`<b>% przebicia vs lethality:</b> % wygrywa, gdy pancerz celu (po obecnym % przebicia) &gt; <b>${nf0.format(thrPL)}</b>.
-      Teraz: ${nf0.format(A * (1 - P))} → ${A * (1 - P) > thrPL ? '<span class="ok">% przebicia</span>' : '<span class="ok">lethality</span>'}.`);
-  }
-  document.getElementById('att-rules').innerHTML = att.map(x => `<li>${x}</li>`).join('');
-
-  const def = [];
-  if (pierced) {
-    def.push(`Lethality przeciwnika zeruje cały pancerz – pierwsze punkty pancerza <b>nic nie dają</b>, dopóki nie przebijesz się ponad jego lethality. Kupuj HP.`);
-  } else if (s.hp > 0) {
-    const ratio = s.hp * (1 - P) / (100 + ea);
-    const thr = gold.armor / gold.hp;
-    def.push(`<b>HP vs pancerz:</b> pancerz wygrywa, gdy HP × (1 − % przebicia wroga) / (100 + pancerz po przebiciu) &gt; <b>${thr.toFixed(1)}</b>.
-      Teraz: ${ratio.toFixed(2)} → ${ratio > thr ? '<span class="ok">pancerz</span>' : '<span class="ok">HP</span>'}.`);
-    def.push(`Prościej: pancerz się opłaca, gdy masz ok. <b>${nf0.format(thr * (100 + ea) / (1 - P || 1))} HP</b> lub więcej (przy obecnym pancerzu i przebiciu wroga).`);
-  }
-  document.getElementById('def-rules').innerHTML = def.map(x => `<li>${x}</li>`).join('');
-}
-
 /* =====================================================================
-   WYKRES (SVG, bez bibliotek)
+   WYKRES: obrażenia na cios w zależności od pancerza / MR celu
    ===================================================================== */
-function renderCharts() {
-  const maxG = Math.max(3000, Math.ceil(state.budget / 500) * 500);
-  const steps = [];
-  for (let g = 0; g <= maxG; g += 50) steps.push(g);
+function renderChart(s, m, A) {
+  const boxW = document.getElementById('chart').clientWidth || 900;
+  const W = Math.max(300, boxW), H = W < 600 ? 240 : 300, pad = { l: 42, r: 10, t: 12, b: 28 };
+  const iw = W - pad.l - pad.r, ih = H - pad.t - pad.b;
+  const xMax = Math.max(300, Math.ceil(s.res * 1.3 / 50) * 50);
+  const xs = []; for (let r = 0; r <= xMax; r += 2) xs.push(r);
 
-  const attSeries = ['ad', 'leth', 'pen'].map((k, i) => ({
-    key: k, pts: steps.map(g => ({ g, v: attackerOptions(state, g)[i].gain })),
-  }));
-  const defSeries = ['hp', 'armor'].map((k, i) => ({
-    key: k, pts: steps.map(g => ({ g, v: defenderOptions(state, g)[i].gain })),
-  }));
-  lineChart('att-chart', 'att-legend', attSeries, maxG);
-  lineChart('def-chart', 'def-legend', defSeries, maxG);
-}
+  const series = [
+    { key: 'nopen', color: '#5a5f6b', dash: '5 5', label: 'bez przebicia', f: r => hit(s.dmg, 0, 0, r, state.dr) },
+    { key: 'now',   color: 'var(--now)', label: 'teraz',                     f: r => hit(s.dmg, s.flat, s.pct, r, state.dr) },
+    { key: 'dmg',   color: m.cDmg,  icon: m.dmg,  amount: A[m.dmg],  f: r => hit(s.dmg + A[m.dmg], s.flat, s.pct, r, state.dr) },
+    { key: 'flat',  color: m.cFlat, icon: m.flat, amount: A[m.flat], f: r => hit(s.dmg, s.flat + A[m.flat], s.pct, r, state.dr) },
+  ];
+  series.forEach(se => se.pts = xs.map(r => se.f(r)));
 
-function lineChart(boxId, legendId, series, maxG) {
-  const W = 520, H = 260, m = { l: 48, r: 16, t: 10, b: 30 };
-  const iw = W - m.l - m.r, ih = H - m.t - m.b;
-  const maxV = Math.max(0.01, ...series.flatMap(s => s.pts.map(p => p.v)));
-  const niceMax = niceCeil(maxV);
-  const x = g => m.l + (g / maxG) * iw;
-  const y = v => m.t + ih - (Math.max(0, v) / niceMax) * ih;
+  const yMaxRaw = Math.max(1, ...series.flatMap(se => se.pts));
+  const yStep = niceStep(yMaxRaw * 1.05 / 4), yMax = yStep * Math.ceil(yMaxRaw * 1.05 / yStep);
+  const X = r => pad.l + r / xMax * iw;
+  const Y = v => pad.t + ih - Math.max(0, v) / yMax * ih;
 
-  const yTicks = [0, .25, .5, .75, 1].map(f => f * niceMax);
-  const xTicks = []; for (let g = 0; g <= maxG; g += 500) xTicks.push(g);
+  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Obrażenia na cios w zależności od pancerza celu">`;
+  for (let v = 0; v <= yMax + 1e-9; v += yStep) {
+    svg += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="#20252f"/>`;
+    svg += `<text x="${pad.l - 8}" y="${Y(v) + 4}" fill="#6b6a66" font-size="12" text-anchor="end">${nf0.format(v)}</text>`;
+  }
+  for (let r = 0; r <= xMax; r += (W < 600 ? 100 : 50))
+    svg += `<text x="${X(r)}" y="${H - 8}" fill="#6b6a66" font-size="12" text-anchor="middle">${r}</text>`;
 
-  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Wykres zysku w zależności od golda">`;
-  yTicks.forEach(v => {
-    svg += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}" stroke="#232834" stroke-width="1"/>`;
-    svg += `<text x="${m.l - 8}" y="${y(v) + 4}" fill="#6b6a66" font-size="11" text-anchor="end">+${nf0.format(v * 100)}%</text>`;
+  // obszar zysku z przebicia
+  const now = series[1], np = series[0];
+  let area = xs.map((r, i) => `${i ? 'L' : 'M'}${X(r).toFixed(1)},${Y(now.pts[i]).toFixed(1)}`).join('');
+  area += xs.slice().reverse().map((r, j) => `L${X(r).toFixed(1)},${Y(np.pts[xs.length - 1 - j]).toFixed(1)}`).join('') + 'Z';
+  svg += `<path d="${area}" fill="var(--now)" opacity=".07"/>`;
+
+  // znacznik celu
+  svg += `<line x1="${X(s.res)}" x2="${X(s.res)}" y1="${pad.t}" y2="${pad.t + ih}" stroke="#785a28" stroke-dasharray="3 4"/>`;
+
+  series.forEach(se => {
+    const d = se.pts.map((v, i) => `${i ? 'L' : 'M'}${X(xs[i]).toFixed(1)},${Y(v).toFixed(1)}`).join('');
+    svg += `<path d="${d}" fill="none" stroke="${se.color}" stroke-width="${se.key === 'now' ? 2.5 : 2}" ${se.dash ? `stroke-dasharray="${se.dash}"` : ''} stroke-linejoin="round"/>`;
   });
-  xTicks.forEach(g => {
-    svg += `<text x="${x(g)}" y="${H - 8}" fill="#6b6a66" font-size="11" text-anchor="middle">${nf0.format(g)}</text>`;
+  // kropki w miejscu celu
+  series.slice(1).forEach(se => {
+    svg += `<circle cx="${X(s.res)}" cy="${Y(se.f(s.res))}" r="4.5" fill="${se.color}" stroke="#12161f" stroke-width="2"/>`;
   });
-  // znacznik budżetu
-  svg += `<line x1="${x(state.budget)}" x2="${x(state.budget)}" y1="${m.t}" y2="${m.t + ih}" stroke="#785a28" stroke-dasharray="4 4"/>`;
-  svg += `<text x="${x(state.budget) + 4}" y="${m.t + 12}" fill="#c8aa6e" font-size="11">budżet</text>`;
 
-  series.forEach(s => {
-    const d = s.pts.map((p, i) => `${i ? 'L' : 'M'}${x(p.g).toFixed(1)},${y(p.v).toFixed(1)}`).join('');
-    svg += `<path d="${d}" fill="none" stroke="var(--c-${s.key})" stroke-width="2" stroke-linejoin="round"/>`;
-  });
-  svg += `<line class="xh" x1="0" x2="0" y1="${m.t}" y2="${m.t + ih}" stroke="#a09b8c" stroke-width="1" visibility="hidden"/>`;
-  series.forEach(s => {
-    svg += `<circle class="dot-${s.key}" r="4" fill="var(--c-${s.key})" stroke="#12161f" stroke-width="2" visibility="hidden"/>`;
-  });
-  svg += `<rect class="hit" x="${m.l}" y="${m.t}" width="${iw}" height="${ih}" fill="transparent"/>`;
-  svg += `</svg><div class="tip"></div>`;
+  svg += `<line class="xh" y1="${pad.t}" y2="${pad.t + ih}" stroke="#a09b8c" visibility="hidden"/>`;
+  svg += `<rect class="hit" x="${pad.l}" y="${pad.t}" width="${iw}" height="${ih}" fill="transparent"/></svg><div class="tip"></div>`;
 
-  const box = document.getElementById(boxId);
+  const box = document.getElementById('chart');
   box.innerHTML = svg;
-  document.getElementById(legendId).innerHTML = series.map(s =>
-    `<span><i style="background:var(--c-${s.key})"></i>${iconHTML(s.key, 'sm')}${LABEL[s.key]}</span>`).join('');
+
+  // legenda
+  const sw = se => `<i style="border-color:${se.color};${se.dash ? 'border-top-style:dashed' : ''}"></i>`;
+  document.getElementById('legend').innerHTML = series.map(se =>
+    `<span>${sw(se)}${se.icon ? `+${se.amount} ${ic(se.icon, 'sm')}` : se.label}</span>`).join('') +
+    `<span style="margin-left:auto">${ic(m.res, 'sm')} celu →</span>`;
+
+  // przedziały pancerza / MR, w których płaskie przebicie jest lepsze
+  const dS = series[2], fS = series[3];
+  const ranges = []; let start = null;
+  xs.forEach((r, i) => {
+    const better = fS.pts[i] > dS.pts[i] + 1e-9;
+    if (better && start === null) start = r;
+    if (!better && start !== null) { ranges.push([start, xs[i - 1]]); start = null; }
+  });
+  if (start !== null) ranges.push([start, null]);
+  const rtxt = ([a, b]) => b === null ? `<b>${a}+</b>` : `<b>${a}–${b}</b>`;
+  document.getElementById('cross').innerHTML = ranges.length === 0
+    ? `${ic(m.dmg, 'sm')} lepsze przy każdym ${ic(m.res, 'sm')}`
+    : `${ic(m.flat, 'sm')} lepsze od ${ic(m.dmg, 'sm')}, gdy cel ma ${ranges.map(rtxt).join(', ')} ${ic(m.res, 'sm')}`;
 
   // hover
-  const svgEl = box.querySelector('svg'), tip = box.querySelector('.tip'), xh = svgEl.querySelector('.xh');
-  const hit = svgEl.querySelector('.hit');
-  const show = (evt) => {
-    const r = svgEl.getBoundingClientRect();
-    const px = (evt.clientX - r.left) * (W / r.width);
-    const g = Math.round(Math.min(maxG, Math.max(0, (px - m.l) / iw * maxG)) / 50) * 50;
-    const idx = g / 50;
-    xh.setAttribute('x1', x(g)); xh.setAttribute('x2', x(g)); xh.setAttribute('visibility', 'visible');
-    const rows = series.map(s => ({ s, v: s.pts[idx].v })).sort((a, b) => b.v - a.v);
-    series.forEach(s => {
-      const c = svgEl.querySelector('.dot-' + s.key);
-      c.setAttribute('cx', x(g)); c.setAttribute('cy', y(s.pts[idx].v)); c.setAttribute('visibility', 'visible');
-    });
-    tip.innerHTML = `<div style="color:#c8aa6e;margin-bottom:3px">${nf0.format(g)} golda</div>` +
-      rows.map(({ s, v }) => `<div class="row"><i style="background:var(--c-${s.key})"></i>${LABEL[s.key]}: <b>${pct(v)}</b></div>`).join('');
+  const el = box.querySelector('svg'), tip = box.querySelector('.tip'), xh = el.querySelector('.xh');
+  el.querySelector('.hit').addEventListener('pointermove', e => {
+    const rc = el.getBoundingClientRect();
+    const px = (e.clientX - rc.left) * (W / rc.width);
+    const i = Math.round(Math.min(1, Math.max(0, (px - pad.l) / iw)) * (xs.length - 1));
+    xh.setAttribute('x1', X(xs[i])); xh.setAttribute('x2', X(xs[i])); xh.setAttribute('visibility', 'visible');
+    tip.innerHTML = `<div class="r" style="color:var(--gold)">${SHORT[m.res]}: ${xs[i]}</div>` +
+      series.slice().reverse().map(se => `<div class="r">${sw(se)}${se.icon ? '+' + se.amount + ' ' + SHORT[se.icon] : se.label}: <b>${nf0.format(se.pts[i])}</b></div>`).join('');
     tip.style.display = 'block';
     const bx = box.getBoundingClientRect();
-    let left = evt.clientX - bx.left + 12;
-    if (left + tip.offsetWidth > bx.width) left = evt.clientX - bx.left - tip.offsetWidth - 12;
+    let left = e.clientX - bx.left + 14;
+    if (left + tip.offsetWidth > bx.width) left = e.clientX - bx.left - tip.offsetWidth - 14;
     tip.style.left = left + 'px';
-    tip.style.top = Math.max(0, evt.clientY - bx.top - tip.offsetHeight - 8) + 'px';
-  };
-  const hide = () => {
-    tip.style.display = 'none'; xh.setAttribute('visibility', 'hidden');
-    series.forEach(s => svgEl.querySelector('.dot-' + s.key).setAttribute('visibility', 'hidden'));
-  };
-  hit.addEventListener('pointermove', show);
-  hit.addEventListener('pointerleave', hide);
+    tip.style.top = Math.max(0, e.clientY - bx.top - tip.offsetHeight - 10) + 'px';
+  });
+  el.querySelector('.hit').addEventListener('pointerleave', () => { tip.style.display = 'none'; xh.setAttribute('visibility', 'hidden'); });
 }
-function niceCeil(v) {
+function niceStep(v) {
   const p = Math.pow(10, Math.floor(Math.log10(v)));
   for (const k of [1, 2, 2.5, 5, 10]) if (k * p >= v) return k * p;
   return 10 * p;
 }
 
 /* =====================================================================
+   USTAWIENIA KOWADEŁ
+   ===================================================================== */
+function buildAnvilSettings() {
+  const keys = ['ad', 'leth', 'ap', 'mpen', 'hp', 'armor', 'mr'];
+  let h = `<span></span><span class="h">Szare</span><span class="h">Złote</span>`;
+  keys.forEach(k => {
+    h += `<span>${ic(k, 'sm')}</span>` + ['silver', 'gold'].map(t =>
+      `<input type="number" step="1" min="0" value="${ANVIL[t][k]}" data-t="${t}" data-k="${k}">`).join('');
+  });
+  const box = document.getElementById('anv');
+  box.innerHTML = h;
+  box.querySelectorAll('input').forEach(inp => inp.addEventListener('input', () => {
+    const v = parseFloat(inp.value);
+    if (v >= 0) { ANVIL[inp.dataset.t][inp.dataset.k] = v; render(); }
+  }));
+}
+
+/* =====================================================================
    START
    ===================================================================== */
-buildFields('defender-fields', FIELDS.defender);
-buildFields('attacker-fields', FIELDS.attacker);
-bind('budget', 'budget', 'budget-range');
-document.querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => {
-  state.budget = +b.dataset.b;
-  document.getElementById('budget').value = state.budget;
-  document.getElementById('budget-range').value = state.budget;
-  render();
-}));
-buildGoldValues();
+document.querySelectorAll('#seg-mode button').forEach(b => b.addEventListener('click', () => setMode(b.dataset.v)));
+document.querySelectorAll('#seg-tier button').forEach(b => b.addEventListener('click', () => { state.tier = b.dataset.v; syncSeg(); render(); }));
+let rz; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(render, 120); });
+syncSeg();
+buildRows();
+buildAnvilSettings();
 render();
 </script>
 </body>

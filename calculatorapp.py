@@ -3,9 +3,9 @@ from pathlib import Path
 import streamlit as st
 import streamlit.components.v1 as components
  
-st.set_page_config(page_title="LoL Kalkulator", page_icon="⚔️", layout="wide")
+st.set_page_config(page_title="LoL Arena Calculator", page_icon="⚔️", layout="wide")
  
-# ukrywa menu i margines Streamlita, żeby było widać tylko kalkulator
+# hide Streamlit's menu and margins so only the calculator is visible
 st.markdown(
     """
     <style>

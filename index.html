@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="pl">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Arena · Kowadło</title>
+<title>Arena · Anvil Calculator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -20,11 +20,11 @@
     --win: #0ac8b9;
     --now: #d8d2c2;
 
-    /* kolory jak w LoL (ikonki zastępcze) */
+    /* colours as in LoL (fallback icons) */
     --i-ad: #f0892e; --i-ap: #6f8cff; --i-armor: #e8c35a; --i-mr: #a07cff;
     --i-hp: #3cc05a; --i-leth: #e5533f; --i-mpen: #b26bf0; --i-dr: #9aa3b5;
 
-    /* kolory linii na wykresie (sprawdzone pod daltonizm na ciemnym tle) */
+    /* chart line colours (checked for colour-blindness on a dark background) */
     --c-dmg-phys: #d06f1a; --c-flat-phys: #c04fc0;
     --c-dmg-mag:  #4f86e8; --c-flat-mag:  #c75bb0;
   }
@@ -37,7 +37,7 @@
   }
   .wrap { max-width: 980px; margin: 0 auto; padding: 20px 16px 40px; }
 
-  /* ---------- góra ---------- */
+  /* ---------- top ---------- */
   .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
   h1 { font-family: Cinzel, serif; color: var(--gold); margin: 0; font-size: 26px; letter-spacing: .04em; }
   .seg { display: inline-flex; background: #0b0e14; border: 1px solid var(--line); border-radius: 8px; padding: 3px; gap: 3px; }
@@ -49,7 +49,7 @@
   .seg .dot { width: 10px; height: 10px; border-radius: 50%; }
   .toggles { display: flex; gap: 10px; flex-wrap: wrap; }
 
-  /* ---------- panele ---------- */
+  /* ---------- panels ---------- */
   .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   @media (max-width: 760px) { .grid2 { grid-template-columns: 1fr; } }
   .panel {
@@ -58,7 +58,7 @@
   }
   .ptitle { font-family: Cinzel, serif; color: var(--gold); font-size: 14px; letter-spacing: .08em; margin: 0 0 12px; }
 
-  /* ---------- ikonki ---------- */
+  /* ---------- icons ---------- */
   .ic { width: 24px; height: 24px; flex: 0 0 24px; display: inline-flex; align-items: center; justify-content: center; position: relative; }
   .ic img, .ic svg { width: 100%; height: 100%; object-fit: contain; }
   .ic.sm { width: 16px; height: 16px; flex-basis: 16px; }
@@ -71,7 +71,7 @@
   .pair .slash { color: var(--muted); font-weight: 300; font-size: 18px; margin: 0 1px; }
   .pair .off { opacity: .28; filter: grayscale(.6); }
 
-  /* ---------- suwaki ---------- */
+  /* ---------- sliders ---------- */
   .row { display: grid; grid-template-columns: 64px 1fr 76px; gap: 10px; align-items: center; margin-bottom: 12px; }
   .row:last-child { margin-bottom: 0; }
   .row .solo { display: flex; justify-content: center; }
@@ -82,7 +82,7 @@
   }
   input[type=number]:focus { outline: 1px solid var(--gold); border-color: var(--gold); }
 
-  /* ---------- werdykt ---------- */
+  /* ---------- verdict ---------- */
   .vs { display: grid; grid-template-columns: 1fr auto 1fr; align-items: stretch; gap: 10px; }
   .vs .or { align-self: center; color: var(--muted); font-size: 13px; font-weight: 600; }
   .opt {
@@ -96,7 +96,7 @@
   .opt.best .what { color: var(--text); }
   .opt .tag { font-size: 11px; font-weight: 700; letter-spacing: .06em; color: var(--win); height: 14px; margin-top: 2px; }
 
-  /* ---------- wykres ---------- */
+  /* ---------- chart ---------- */
   .chart-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
   .big { font-size: 34px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; }
   .big small { font-size: 13px; font-weight: 500; color: var(--text-2); margin-left: 6px; }
@@ -129,37 +129,37 @@
 <div class="wrap">
 
   <div class="top">
-    <h1>Arena · Kowadło</h1>
+    <h1>Arena · Anvil</h1>
     <div class="toggles">
       <div class="seg" id="seg-mode">
-        <button data-v="phys"><span class="ic sm" data-icon="ad"></span>Fizyczne</button>
-        <button data-v="mag"><span class="ic sm" data-icon="ap"></span>Magiczne</button>
+        <button data-v="phys"><span class="ic sm" data-icon="ad"></span>Physical</button>
+        <button data-v="mag"><span class="ic sm" data-icon="ap"></span>Magic</button>
       </div>
       <div class="seg" id="seg-tier">
-        <button data-v="silver"><span class="dot" style="background:#a7adb8"></span>Szare</button>
-        <button data-v="gold"><span class="dot" style="background:#e2b84a"></span>Złote</button>
+        <button data-v="silver"><span class="dot" style="background:#a7adb8"></span>Silver</button>
+        <button data-v="gold"><span class="dot" style="background:#e2b84a"></span>Gold</button>
       </div>
     </div>
   </div>
 
   <div class="grid2">
     <section class="panel">
-      <div class="ptitle">ATAKUJĄCY</div>
+      <div class="ptitle">ATTACKER</div>
       <div id="atk-rows"></div>
     </section>
     <section class="panel">
-      <div class="ptitle">CEL</div>
+      <div class="ptitle">TARGET</div>
       <div id="def-rows"></div>
     </section>
   </div>
 
   <div class="grid2" style="margin-top:14px">
     <section class="panel">
-      <div class="ptitle">KOWADŁO · ATAK</div>
+      <div class="ptitle">ANVIL · OFFENCE</div>
       <div class="vs" id="vs-atk"></div>
     </section>
     <section class="panel">
-      <div class="ptitle">KOWADŁO · OBRONA</div>
+      <div class="ptitle">ANVIL · DEFENCE</div>
       <div class="vs" id="vs-def"></div>
     </section>
   </div>
@@ -174,32 +174,32 @@
     <div class="cross" id="cross"></div>
 
     <details>
-      <summary>Wartości kowadeł</summary>
+      <summary>Anvil values</summary>
       <div class="anv" id="anv"></div>
     </details>
   </section>
 
   <footer>
-    Nieoficjalny kalkulator fanowski, niezwiązany z Riot Games. League of Legends jest znakiem towarowym Riot Games, Inc. Ikonki: League of Legends Wiki.
+    Unofficial fan-made calculator, not affiliated with Riot Games. League of Legends is a trademark of Riot Games, Inc. Icons: League of Legends Wiki.
   </footer>
 </div>
 
 <script>
 /* =====================================================================
-   IKONKI – najpierw LoL Wiki, potem folder icons/, na końcu własne SVG
+   ICONS – LoL Wiki first, then the icons/ folder, finally built-in SVG
    ===================================================================== */
 const WIKI = 'https://wiki.leagueoflegends.com/en-us/images/';
 const ICONS = {
   ad:    { name: 'AD',                         src: [WIKI + 'Attack_damage_icon.svg', 'icons/ad.png'],          color: 'var(--i-ad)' },
   ap:    { name: 'AP',                         src: [WIKI + 'Ability_power_icon.svg', 'icons/ap.png'],          color: 'var(--i-ap)' },
   leth:  { name: 'Lethality',                  src: [WIKI + 'Armor_penetration_icon.svg', 'icons/lethality.png'], color: 'var(--i-leth)' },
-  mpen:  { name: 'Przebicie odporności na magię', src: [WIKI + 'Magic_penetration_icon.svg', 'icons/magicpen.png'], color: 'var(--i-mpen)' },
-  apenp: { name: '% przebicia pancerza',       src: [WIKI + 'Armor_penetration_icon.svg', 'icons/lethality.png'], color: 'var(--i-leth)', pct: true },
-  mpenp: { name: '% przebicia odporności na magię', src: [WIKI + 'Magic_penetration_icon.svg', 'icons/magicpen.png'], color: 'var(--i-mpen)', pct: true },
-  hp:    { name: 'Zdrowie',                    src: [WIKI + 'Health_icon.png', 'icons/health.png'],            color: 'var(--i-hp)' },
-  armor: { name: 'Pancerz',                    src: [WIKI + 'Armor_icon.svg', 'icons/armor.png'],              color: 'var(--i-armor)' },
-  mr:    { name: 'Odporność na magię',         src: [WIKI + 'Magic_resistance_icon.svg', 'icons/mr.png'],      color: 'var(--i-mr)' },
-  dr:    { name: 'Redukcja obrażeń (np. Exhaust, Anathema\'s Chains)', src: [],                            color: 'var(--i-dr)' },
+  mpen:  { name: 'Magic penetration', src: [WIKI + 'Magic_penetration_icon.svg', 'icons/magicpen.png'], color: 'var(--i-mpen)' },
+  apenp: { name: '% armor penetration',       src: [WIKI + 'Armor_penetration_icon.svg', 'icons/lethality.png'], color: 'var(--i-leth)', pct: true },
+  mpenp: { name: '% magic penetration', src: [WIKI + 'Magic_penetration_icon.svg', 'icons/magicpen.png'], color: 'var(--i-mpen)', pct: true },
+  hp:    { name: 'Health',                    src: [WIKI + 'Health_icon.png', 'icons/health.png'],            color: 'var(--i-hp)' },
+  armor: { name: 'Armor',                    src: [WIKI + 'Armor_icon.svg', 'icons/armor.png'],              color: 'var(--i-armor)' },
+  mr:    { name: 'Magic resist',         src: [WIKI + 'Magic_resistance_icon.svg', 'icons/mr.png'],      color: 'var(--i-mr)' },
+  dr:    { name: 'Damage reduction (e.g. Exhaust, Anathema\'s Chains)', src: [],                            color: 'var(--i-dr)' },
 };
 const SVG = {
   ad:    '<path d="M19 3h2v2l-9.5 9.5-2-2z" fill="currentColor"/><path d="M8 13l3 3-1.5 1.5-1-1L5 20l-1-1 3.5-3.5-1-1z" fill="currentColor"/>',
@@ -216,7 +216,7 @@ const SVG = {
 function ic(key, size = '', extra = '') {
   return `<span class="ic ${size} ${ICONS[key].pct ? 'pct' : ''} ${extra}" data-icon="${key}" title="${ICONS[key].name}"></span>`;
 }
-const RESOLVED = {}; // zapamiętane: który adres ikonki działa (albo 'svg')
+const RESOLVED = {}; // remembered: which icon URL works (or 'svg')
 function paintIcon(el, key, src) {
   const def = ICONS[key];
   if (src === 'svg') {
@@ -242,14 +242,14 @@ function hydrateIcons(root = document) {
 }
 
 /* =====================================================================
-   DANE
-   Wartości kowadeł z LoL Wiki (Stat Bonus (Arena)). Można je zmienić na stronie.
+   DATA
+   Anvil values from the LoL Wiki (Stat Bonus (Arena)). They can be edited on the page.
    ===================================================================== */
 const ANVIL = {
   silver: { ad: 15, leth: 15, ap: 25, mpen: 15, hp: 150, armor: 15, mr: 15 },
   gold:   { ad: 35, leth: 20, ap: 50, mpen: 18, hp: 375, armor: 45, mr: 45 },
 };
-// jakie statystyki są „w grze” w danym trybie
+// which stats are "in play" in a given mode
 const MODE = {
   phys: { dmg: 'ad', flat: 'leth', pct: 'apenp', res: 'armor', cDmg: 'var(--c-dmg-phys)', cFlat: 'var(--c-flat-phys)' },
   mag:  { dmg: 'ap', flat: 'mpen', pct: 'mpenp', res: 'mr',    cDmg: 'var(--c-dmg-mag)',  cFlat: 'var(--c-flat-mag)' },
@@ -267,31 +267,31 @@ const LIMITS = {
 };
 
 /* =====================================================================
-   MATEMATYKA – tak samo dla pancerza i odporności na magię
+   MATH – the same for armor and magic resist
    ===================================================================== */
-// najpierw % przebicia, potem płaskie (lethality / magic pen); nie niżej niż 0
+// % penetration first, then flat (lethality / magic pen); never below 0
 function effRes(res, pct, flat) {
   if (res <= 0) return res;
   return Math.max(0, res * (1 - Math.min(pct, 100) / 100) - Math.max(flat, 0));
 }
 function mult(r) { return r >= 0 ? 100 / (100 + r) : 2 - 100 / (100 - r); }
-// obrażenia jednego ciosu o skalowaniu 100%
+// damage of a single hit with 100% scaling
 function hit(dmg, flat, pct, res, dr) { return dmg * mult(effRes(res, pct, flat)) * (1 - dr / 100); }
 function ehp(hp, res, pct, flat, dr) { return hp / (mult(effRes(res, pct, flat)) * (1 - Math.min(dr, 99) / 100)); }
 
 /* =====================================================================
    UI
    ===================================================================== */
-const SHORT = { ad: 'AD', ap: 'AP', leth: 'Lethality', mpen: 'Magic Pen', armor: 'Pancerz', mr: 'MR' };
+const SHORT = { ad: 'AD', ap: 'AP', leth: 'Lethality', mpen: 'Magic Pen', armor: 'Armor', mr: 'MR' };
 const cur = () => state[state.mode];
 const M = () => MODE[state.mode];
-const nf0 = new Intl.NumberFormat('pl-PL', { maximumFractionDigits: 0 });
-const pct = x => (x >= 0 ? '+' : '−') + new Intl.NumberFormat('pl-PL', { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(Math.abs(x * 100)) + '%';
+const nf0 = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
+const pct = x => (x >= 0 ? '+' : '−') + new Intl.NumberFormat('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(Math.abs(x * 100)) + '%';
 
 function pairHTML(slot) {
   const [p, m] = PAIR[slot];
   const on = state.mode === 'phys' ? p : m;
-  return `<span class="pair" data-toggle title="Przełącz fizyczne / magiczne">
+  return `<span class="pair" data-toggle title="Switch physical / magic">
     ${ic(p, '', on === p ? '' : 'off')}<span class="slash">/</span>${ic(m, '', on === m ? '' : 'off')}</span>`;
 }
 function rowHTML(id, iconHTML, slot) {
@@ -338,7 +338,7 @@ function vsHTML(a, b) {
   const card = (o, best) => `<div class="opt ${best ? 'best' : ''}">
       <div class="what">${ic(o.icon, 'lg')}+${nf0.format(o.amount)}</div>
       <div class="gain">${pct(o.gain)}</div>
-      <div class="tag">${best ? (tie ? 'REMIS' : 'BIERZ') : ''}</div>
+      <div class="tag">${best ? (tie ? 'TIE' : 'PICK') : ''}</div>
     </div>`;
   return card(a, tie || a.gain > b.gain) + `<div class="or">vs</div>` + card(b, tie || b.gain > a.gain);
 }
@@ -347,22 +347,22 @@ function render() {
   const s = cur(), m = M(), A = ANVIL[state.tier];
   const base = hit(s.dmg, s.flat, s.pct, s.res, state.dr);
 
-  // --- atak ---
+  // --- offence ---
   const aDmg  = { icon: m.dmg,  amount: A[m.dmg],  gain: base > 0 ? hit(s.dmg + A[m.dmg], s.flat, s.pct, s.res, state.dr) / base - 1 : 0 };
   const aFlat = { icon: m.flat, amount: A[m.flat], gain: base > 0 ? hit(s.dmg, s.flat + A[m.flat], s.pct, s.res, state.dr) / base - 1 : 0 };
   document.getElementById('vs-atk').innerHTML = vsHTML(aDmg, aFlat);
 
-  // --- obrona (przeciwko przebiciu atakującego) ---
+  // --- defence (against the attacker's penetration) ---
   const e0 = ehp(state.hp, s.res, s.pct, s.flat, state.dr);
   const dHp  = { icon: 'hp',  amount: A.hp,    gain: ehp(state.hp + A.hp, s.res, s.pct, s.flat, state.dr) / e0 - 1 };
   const dRes = { icon: m.res, amount: A[m.res], gain: ehp(state.hp, s.res + A[m.res], s.pct, s.flat, state.dr) / e0 - 1 };
   document.getElementById('vs-def').innerHTML = vsHTML(dHp, dRes);
 
-  // --- nagłówek wykresu ---
+  // --- chart header ---
   const noPen = hit(s.dmg, 0, 0, s.res, state.dr);
   const noDr  = hit(s.dmg, s.flat, s.pct, s.res, 0);
   const hits  = base > 0 ? Math.ceil(state.hp / base) : '∞';
-  document.getElementById('big').innerHTML = `${nf0.format(base)}<small>obrażeń / cios · ${hits} ciosów</small>`;
+  document.getElementById('big').innerHTML = `${nf0.format(base)}<small>damage / hit · ${hits} hits to kill</small>`;
   let pills = '';
   if (noPen > 0 && base / (noPen) - 1 > 0.0005 && (s.flat > 0 || s.pct > 0))
     pills += `<span class="pill up">${ic(m.flat, 'sm')}${ic(m.pct, 'sm')} ${pct(hit(s.dmg, s.flat, s.pct, s.res, 0) / hit(s.dmg, 0, 0, s.res, 0) - 1)}</span>`;
@@ -375,7 +375,7 @@ function render() {
 }
 
 /* =====================================================================
-   WYKRES: obrażenia na cios w zależności od pancerza / MR celu
+   CHART: damage per hit vs. the target's armor / MR
    ===================================================================== */
 function renderChart(s, m, A) {
   const boxW = document.getElementById('chart').clientWidth || 900;
@@ -385,8 +385,8 @@ function renderChart(s, m, A) {
   const xs = []; for (let r = 0; r <= xMax; r += 2) xs.push(r);
 
   const series = [
-    { key: 'nopen', color: '#5a5f6b', dash: '5 5', label: 'bez przebicia', f: r => hit(s.dmg, 0, 0, r, state.dr) },
-    { key: 'now',   color: 'var(--now)', label: 'teraz',                     f: r => hit(s.dmg, s.flat, s.pct, r, state.dr) },
+    { key: 'nopen', color: '#5a5f6b', dash: '5 5', label: 'no penetration', f: r => hit(s.dmg, 0, 0, r, state.dr) },
+    { key: 'now',   color: 'var(--now)', label: 'current',                     f: r => hit(s.dmg, s.flat, s.pct, r, state.dr) },
     { key: 'dmg',   color: m.cDmg,  icon: m.dmg,  amount: A[m.dmg],  f: r => hit(s.dmg + A[m.dmg], s.flat, s.pct, r, state.dr) },
     { key: 'flat',  color: m.cFlat, icon: m.flat, amount: A[m.flat], f: r => hit(s.dmg, s.flat + A[m.flat], s.pct, r, state.dr) },
   ];
@@ -397,7 +397,7 @@ function renderChart(s, m, A) {
   const X = r => pad.l + r / xMax * iw;
   const Y = v => pad.t + ih - Math.max(0, v) / yMax * ih;
 
-  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Obrażenia na cios w zależności od pancerza celu">`;
+  let svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Damage per hit vs. target armor">`;
   for (let v = 0; v <= yMax + 1e-9; v += yStep) {
     svg += `<line x1="${pad.l}" x2="${W - pad.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="#20252f"/>`;
     svg += `<text x="${pad.l - 8}" y="${Y(v) + 4}" fill="#6b6a66" font-size="12" text-anchor="end">${nf0.format(v)}</text>`;
@@ -405,20 +405,20 @@ function renderChart(s, m, A) {
   for (let r = 0; r <= xMax; r += (W < 600 ? 100 : 50))
     svg += `<text x="${X(r)}" y="${H - 8}" fill="#6b6a66" font-size="12" text-anchor="middle">${r}</text>`;
 
-  // obszar zysku z przebicia
+  // area gained from penetration
   const now = series[1], np = series[0];
   let area = xs.map((r, i) => `${i ? 'L' : 'M'}${X(r).toFixed(1)},${Y(now.pts[i]).toFixed(1)}`).join('');
   area += xs.slice().reverse().map((r, j) => `L${X(r).toFixed(1)},${Y(np.pts[xs.length - 1 - j]).toFixed(1)}`).join('') + 'Z';
   svg += `<path d="${area}" fill="var(--now)" opacity=".07"/>`;
 
-  // znacznik celu
+  // target marker
   svg += `<line x1="${X(s.res)}" x2="${X(s.res)}" y1="${pad.t}" y2="${pad.t + ih}" stroke="#785a28" stroke-dasharray="3 4"/>`;
 
   series.forEach(se => {
     const d = se.pts.map((v, i) => `${i ? 'L' : 'M'}${X(xs[i]).toFixed(1)},${Y(v).toFixed(1)}`).join('');
     svg += `<path d="${d}" fill="none" stroke="${se.color}" stroke-width="${se.key === 'now' ? 2.5 : 2}" ${se.dash ? `stroke-dasharray="${se.dash}"` : ''} stroke-linejoin="round"/>`;
   });
-  // kropki w miejscu celu
+  // dots at the target's value
   series.slice(1).forEach(se => {
     svg += `<circle cx="${X(s.res)}" cy="${Y(se.f(s.res))}" r="4.5" fill="${se.color}" stroke="#12161f" stroke-width="2"/>`;
   });
@@ -429,13 +429,13 @@ function renderChart(s, m, A) {
   const box = document.getElementById('chart');
   box.innerHTML = svg;
 
-  // legenda
+  // legend
   const sw = se => `<i style="border-color:${se.color};${se.dash ? 'border-top-style:dashed' : ''}"></i>`;
   document.getElementById('legend').innerHTML = series.map(se =>
     `<span>${sw(se)}${se.icon ? `+${se.amount} ${ic(se.icon, 'sm')}` : se.label}</span>`).join('') +
-    `<span style="margin-left:auto">${ic(m.res, 'sm')} celu →</span>`;
+    `<span style="margin-left:auto">target ${ic(m.res, 'sm')} →</span>`;
 
-  // przedziały pancerza / MR, w których płaskie przebicie jest lepsze
+  // armor / MR ranges where flat penetration is better
   const dS = series[2], fS = series[3];
   const ranges = []; let start = null;
   xs.forEach((r, i) => {
@@ -446,8 +446,8 @@ function renderChart(s, m, A) {
   if (start !== null) ranges.push([start, null]);
   const rtxt = ([a, b]) => b === null ? `<b>${a}+</b>` : `<b>${a}–${b}</b>`;
   document.getElementById('cross').innerHTML = ranges.length === 0
-    ? `${ic(m.dmg, 'sm')} lepsze przy każdym ${ic(m.res, 'sm')}`
-    : `${ic(m.flat, 'sm')} lepsze od ${ic(m.dmg, 'sm')}, gdy cel ma ${ranges.map(rtxt).join(', ')} ${ic(m.res, 'sm')}`;
+    ? `${ic(m.dmg, 'sm')} is better at any ${ic(m.res, 'sm')}`
+    : `${ic(m.flat, 'sm')} beats ${ic(m.dmg, 'sm')} when the target has ${ranges.map(rtxt).join(', ')} ${ic(m.res, 'sm')}`;
 
   // hover
   const el = box.querySelector('svg'), tip = box.querySelector('.tip'), xh = el.querySelector('.xh');
@@ -474,11 +474,11 @@ function niceStep(v) {
 }
 
 /* =====================================================================
-   USTAWIENIA KOWADEŁ
+   ANVIL SETTINGS
    ===================================================================== */
 function buildAnvilSettings() {
   const keys = ['ad', 'leth', 'ap', 'mpen', 'hp', 'armor', 'mr'];
-  let h = `<span></span><span class="h">Szare</span><span class="h">Złote</span>`;
+  let h = `<span></span><span class="h">Silver</span><span class="h">Gold</span>`;
   keys.forEach(k => {
     h += `<span>${ic(k, 'sm')}</span>` + ['silver', 'gold'].map(t =>
       `<input type="number" step="1" min="0" value="${ANVIL[t][k]}" data-t="${t}" data-k="${k}">`).join('');
